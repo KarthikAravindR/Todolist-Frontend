@@ -1,0 +1,47 @@
+.todo {
+    width: 100%;
+    height: 100px;
+    margin: 16px;
+    border-radius: 25px;
+    display: flex;
+    padding: 16px 16px 16px 32px;
+    box-sizing: border-box;
+    align-items: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+p{
+    margin: 0;
+    padding: 0;
+}
+.eachtask {
+    margin: 0 24px;
+}
+.edit{
+    text-align: center;
+    line-height: 40px;
+    padding-left: 4px;
+    box-sizing: border-box;
+    background-color: #ccc;
+    margin-left: auto;
+    margin-right: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+}
+.delete{
+    text-align: center;
+    line-height: 40px;
+    background-color: red;
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+}
+.completed{
+    text-align: center;
+    line-height: 40px;
+    background-color: green;
+    margin: 0 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+}

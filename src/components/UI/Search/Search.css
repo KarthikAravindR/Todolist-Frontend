@@ -1,0 +1,49 @@
+.form1 {
+    display: flex;
+}
+.searchbar {
+    padding:16px 16px;
+    box-sizing: border-box;
+    width: 160px;
+    color: black;
+    border:1px solid rgb(136, 113, 113);
+    border-radius: 5px;
+}
+.searchbar:hover, .searchbar:focus ,.button2:hover, .button2:focus{
+    border-radius: 5px;
+    border: 1px solid rgb(0, 0, 0);
+}
+
+.button2 {
+    display: grid;
+    place-items: center;
+    padding:15px 16px;
+    box-sizing: border-box;
+    margin-left: 4px;
+    width: 80px;
+    color: white;
+    border-radius: 5px;
+    border: teal;
+    background-color: #01202c;
+}
+
+/* @media(max-width: 600px) {
+    .form1{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 4;
+        margin-top: 0;
+    }
+    .searchbar {
+        width: 100%;
+        border-radius: 0;  
+        background-color: #01202c73; 
+    }
+    .button2 {
+        width: 50px;
+        border-radius: 0;
+        margin-left: 0;
+    }
+} */
