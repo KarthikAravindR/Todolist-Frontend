@@ -1,6 +1,6 @@
 .todo {
     width: 100%;
-    height: 100px;
+    min-height: 100px;
     margin: 16px;
     border-radius: 25px;
     display: flex;
@@ -9,17 +9,23 @@
     align-items: center;
     box-shadow: 0 1px 2px rgba(0,0,0,0.35);
 }
+.todo:hover,.todo:focus {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.75);
+}
 p{
     margin: 0;
     padding: 0;
 }
 .eachtask {
+    width:300px;
     margin: 0 24px;
+    word-break: break-all;
 }
 .edit{
     text-align: center;
     line-height: 40px;
     padding-left: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.35);
     box-sizing: border-box;
     background-color: #ccc;
     margin-left: auto;
@@ -44,4 +50,23 @@ p{
     width: 40px;
     height: 40px;
     border-radius: 100px;
+}
+
+@media (max-width: 600px) {
+    .todo {
+        width: 100%;
+        min-height: 100px;
+        margin: 0;
+        border-radius: 25px;
+        display: flex;
+        padding: 8px;
+        box-sizing: border-box;
+        align-items: center;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    }
+    .eachtask {
+        width:200px;
+        margin: 0 8px;
+        word-break: break-all;
+    }
 }

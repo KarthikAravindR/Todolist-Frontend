@@ -1,15 +1,15 @@
 .form1 {
     display: flex;
 }
-.searchbar {
-    padding:16px 16px;
+.searchbar1 {
+    padding:12px 16px;
     box-sizing: border-box;
-    width: 160px;
+    width: 180px;
     color: black;
     border:1px solid rgb(136, 113, 113);
     border-radius: 5px;
 }
-.searchbar:hover, .searchbar:focus ,.button2:hover, .button2:focus{
+.searchbar1:hover, .searchbar1:focus ,.button2:hover, .button2:focus{
     border-radius: 5px;
     border: 1px solid rgb(0, 0, 0);
 }

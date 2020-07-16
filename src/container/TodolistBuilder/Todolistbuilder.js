@@ -12,7 +12,6 @@ class Todolistbuilder extends Component {
     state = {
         searchtask: null,
         addingtask: false,
-        id: 0,
         title: null,
         description: null,
         edittitle: null,
@@ -29,20 +28,23 @@ class Todolistbuilder extends Component {
         this.setState({ addingtask: false })
     }
     searchtaskHandler = (event) => {
-        console.log(event.target.value)
-        console.log(this.state.duplicatetask)
         if (event.target.value === "") {
-            console.log(this.state.duplicatetask)
             this.setState({ task: this.state.duplicatetask })
         } else {
             this.setState({ task: searchfilter(event.target.value, this.state.task) })
+        }
+    }
+    backspaceHandler = (event) => {
+        if(event.key === 'Backspace'){
+            this.setState({
+                task:this.state.duplicatetask
+            })
         }
     }
     titleChangeHandler = (event) => {
         this.setState({ title: event.target.value })
     }
     editTitleHandler = (event) => {
-        console.log(event.target.value)
         this.setState({ edittitle: event.target.value })
     }
     descriptionChangeHandler = (event) => {
@@ -54,19 +56,20 @@ class Todolistbuilder extends Component {
     addTaskHandler = (event) => {
         event.preventDefault()
         let newtask = {
-            id: this.state.id,
             title: this.state.title,
             description: this.state.description,
             completed: false
         }
         const updatedtask = this.state.task.slice()
         updatedtask.push(newtask)
+        updatedtask.forEach((val, i, self) => {
+            self[i].id = i
+        })
         this.setState({
-            id: this.state.id + 1,
             task: updatedtask,
             duplicatetask: updatedtask,
             addingtask: false
-        }, () => console.log(this.state))
+        })
     }
     editClickedHandler = (id) => {
         const updatedtask = this.state.task.slice()
@@ -77,16 +80,29 @@ class Todolistbuilder extends Component {
             edit: true,
             edittitle: edittitle,
             editdescription: editdescription,
-            addingtask: true
+            addingtask: true,
         })
     }
     deleteClickedHandler = (id) => {
-        console.log(id)
         let newTask = this.state.task.slice();
         newTask.splice(id, 1);
         this.setState({
+            editid: null,
+            edit: false,
+            edittitle: null,
+            editdescription: null,
             task: newTask,
             duplicatetask: newTask
+        },() => this.idChangeHandler())
+    }
+    idChangeHandler = () => {
+        let newTask = this.state.task.slice();
+        newTask.forEach((val, i, self) => {
+            self[i].id = i
+        })
+        console.log(newTask)
+        this.setState({
+            task: newTask,
         })
     }
     completedClickedHandler = (id) => {
@@ -100,7 +116,6 @@ class Todolistbuilder extends Component {
     updateEditedHandler = (event) => {
         event.preventDefault()
         let id = this.state.editid
-        console.log(id)
         const updatedtask = this.state.task.slice()
         updatedtask[id].title = this.state.edittitle
         updatedtask[id].description = this.state.editdescription
@@ -116,7 +131,7 @@ class Todolistbuilder extends Component {
                 <Toolbar />
                 <div className="controls">
                     <button className="addtask" onClick={this.modalShowHandler}>+ New Task</button>
-                    <Search Changed={this.searchtaskHandler} />
+                    <Search Changed={this.searchtaskHandler} backspace={this.backspaceHandler}/>
                 </div>
                 {this.state.addingtask ? <Modal
                     show={this.state.addingtask}
@@ -137,7 +152,9 @@ class Todolistbuilder extends Component {
                     editclicked={this.editClickedHandler}
                     deleteclicked={this.deleteClickedHandler}
                     completedclicked={this.completedClickedHandler} />
-                <Paginationpage />
+                <div className="pagination1"> 
+                    <Paginationpage task={this.state.duplicatetask}/>
+                </div>
             </div>
         )
     }

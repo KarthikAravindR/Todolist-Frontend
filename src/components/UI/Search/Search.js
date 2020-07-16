@@ -16,7 +16,7 @@ import './Search.css'
 const search = (props) => {
     return (
         <form className="form1" onSubmit={props.clicked}>
-            <input className="searchbar" type="search" placeholder="Search Your Tasks" onChange={props.Changed}/>
+            <input className="searchbar1" type="search" placeholder="Search Your Tasks" onKeyDown={props.backspace} onChange={props.Changed}/>
             {/* <button className="button2" type="submit">Search</button> */}
         </form>
     )

@@ -1,9 +1,9 @@
 .Modal {
     position: fixed;
     z-index: 500;
-    background-color: black;
-    color:white;
-    border: 1px solid #ccc;
+    background-color: #EDF2F9;
+    color:black;
+    border: 1px solid #EDF2F9;
     width: 70%;
     box-shadow: 1px 1px 1px black;
     padding: 16px;
@@ -11,17 +11,23 @@
     top: 22%;
     box-sizing: border-box;
     transition: all 0.3s ease-out;
-    border-radius: 7px;
 }
 input,textarea {
-    width: 100%;
+    width: 97%;
+    border: 1px solid white;
+    padding: 8px;
 }
 .inputelement {
     margin-bottom: 16px;
     margin-top: 8px;
 }
 .task {
-    margin-left: 83%;
+    margin-left: 77%;
+    background-color: skyblue;
+    border: 1px solid skyblue;
+    border-radius: 12px;
+    width: 100px;
+    height: 40px;
 }
 
 @media (min-width: 600px) {

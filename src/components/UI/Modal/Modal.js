@@ -9,8 +9,6 @@ class Modal extends Component {
         return nextProps.show !== this.props.show || nextProps.children !== this.props.children;
     }
     render() {
-        console.log(this.props.editid)
-        console.log(this.props.alltask)
         return (
             <div>
                 <Backdrop show={this.props.show} clicked={this.props.modalclosed} />

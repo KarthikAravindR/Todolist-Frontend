@@ -13,7 +13,7 @@ const todo = (props) => {
             <div className="taskicon"><FontAwesomeIcon icon={faThumbtack} style={{fontSize:"1.2rem"}}/></div>
             <div className="eachtask">
                 <p style={{fontSize:"2rem"}}>{props.title}</p>
-                <p style={{color:"rgba(0,0,0,0.5"}}>{props.description}</p>  
+                <p style={{color:"rgba(0,0,0,0.5",marginBottom:"12px"}}>{props.description}</p>  
             </div>
             <div className="completion">&#9679; {props.completed ? "Completed" : "In Progress"}</div>
             {!props.completed ?<div className="edit" onClick={() => props.editclicked(props.id)}><FontAwesomeIcon icon={faEdit}/></div>: null }
