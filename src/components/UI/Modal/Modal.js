@@ -1,53 +1,41 @@
-import React, { Component } from 'react';
-
+import React, { useState } from 'react';
+import LoadingIndicator from '../LoadingIndicator/LoadingIndicator'
 import './Modal.css'
 import Backdrop from '../Backdrop/Backdrop'
 
-class Modal extends Component {
-
-    shouldComponentUpdate (nextProps,nextState) {
-        return nextProps.show !== this.props.show || nextProps.children !== this.props.children;
-    }
-    render() {
+const Modal = (props) =>  {
+        const [ title,setTitle ] = useState('')
+        const [ description,setDescription ] = useState('')
+        const submitHandler = event => {
+            event.preventDefault()
+            props.addTask({title: title, description: description, completed: false})
+            setTitle('')
+            setDescription('')
+        }
         return (
             <div>
-                <Backdrop show={this.props.show} clicked={this.props.modalclosed} />
-                {this.props.edit 
-                ? <div className="Modal" style={{
-                    transform: this.props.show ? 'translateY(0)' : 'translateY(-100vh)',
-                    opacity: this.props.show ? '1' : '0'
+                <Backdrop show={props.show} clicked={props.modalclosed} />
+                <div className="Modal" style={{
+                    transform: props.show ? 'translateY(0)' : 'translateY(-100vh)',
+                    opacity: props.show ? '1' : '0'
                 }}>
-                    <form>
+                    <form onSubmit={submitHandler}>
                         <label>Title</label> 
                         <div className="inputelement">
-                            <input type="text" rows="2" onChange={this.props.edittitlechanged} defaultValue={this.props.edittitle}/>
+                            <input type="text" rows="2"  value={title} onChange={event => {setTitle(event.target.value)}}/>
                         </div>
                         <label>Description</label> 
                         <div className="inputelement">
-                            <textarea rows="5" onChange={this.props.editdeschanged} defaultValue={this.props.editdescription}/>
+                            <textarea rows="5"  value={description} onChange={event => {setDescription(event.target.value)}}/>
                         </div>
-                        <button onClick={this.props.doneclicked} className="task">Done</button>
+                        <div className="addtask1">
+                            {props.isloading && <LoadingIndicator />}
+                            <button type="submit" className="task">ADD TASK</button>
+                        </div>
                     </form>
-            </div>
-                : <div className="Modal" style={{
-                    transform: this.props.show ? 'translateY(0)' : 'translateY(-100vh)',
-                    opacity: this.props.show ? '1' : '0'
-                }}>
-                    <form>
-                        <label>Title</label> 
-                        <div className="inputelement">
-                            <input type="text" rows="2" onChange={this.props.titlechanged}/>
-                        </div>
-                        <label>Description</label> 
-                        <div className="inputelement">
-                            <textarea rows="5" onChange={this.props.deschanged}/>
-                        </div>
-                        <button onClick={this.props.clicked} className="task">Add Task</button>
-                    </form>
-            </div> }
+                </div>
             </div >
         );
-    }
 }
 
 export default Modal

@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
-import Paginationpage from '../../components/UI/Pagination/Pagination'
+import EditModal from '../../components/UI/EditModal/Editmodal'
 import Toolbar from '../../components/Toolbar/Toolbar'
 import Search from '../../components/UI/Search/Search'
 import searchfilter from '../../components/UI/Search/Searchfilter'
@@ -8,156 +9,141 @@ import Modal from '../../components/UI/Modal/Modal'
 import Todolist from '../../components/Todolist/Todolist'
 import './Todolistbuilder.css'
 
-class Todolistbuilder extends Component {
-    state = {
-        searchtask: null,
-        addingtask: false,
-        title: null,
-        description: null,
-        edittitle: null,
-        editdescription: null,
-        task: [],
-        duplicatetask: [],
-        editid: null,
-        edit: false,
+const Todolistbuilder = () => {
+    const [task, setTask] = useState([])
+    const [modalShow, setModalShow] = useState(false)
+    const [editModalShow, setEditModalShow] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const [taskToBeEdited, setTaskToBeEdited] = useState({})
+
+    useEffect(() => {
+        axios.get('https://todolist-karthik.firebaseio.com/tasks.json')
+            .then(response => {
+                const localTask = []
+                for (let key in response.data) {
+                    localTask.push({
+                        id: key,
+                        title: response.data[key].title,
+                        description: response.data[key].description
+                    })
+                }
+                setTask(localTask)
+            }).catch(error => [
+                console.log(error)
+            ])
+    }, [])
+    const modalShowHandler = () => {
+        setModalShow(true)
     }
-    modalShowHandler = () => {
-        this.setState({ addingtask: true })
+    const modalclosehandler = () => {
+        setModalShow(false)
+        setEditModalShow(false)
     }
-    modalclosehandler = () => {
-        this.setState({ addingtask: false })
+    const searchtaskHandler = (event) => {
+        const searchtext = event.target.value
+        axios.get('https://todolist-karthik.firebaseio.com/tasks.json')
+            .then(response => {
+                const localTask = []
+                for (let key in response.data) {
+                    localTask.push({
+                        id: key,
+                        title: response.data[key].title,
+                        description: response.data[key].description
+                    })
+                }
+                setTask(searchfilter(searchtext, localTask))
+            }).catch(error => [
+                console.log(error)
+            ])
     }
-    searchtaskHandler = (event) => {
-        if (event.target.value === "") {
-            this.setState({ task: this.state.duplicatetask })
-        } else {
-            this.setState({ task: searchfilter(event.target.value, this.state.task) })
-        }
-    }
-    backspaceHandler = (event) => {
-        if(event.key === 'Backspace'){
-            this.setState({
-                task:this.state.duplicatetask
+    const addTaskHandler = task => {
+        setIsLoading(true)
+        axios.post('https://todolist-karthik.firebaseio.com/tasks.json', task)
+            .then(response => {
+                setTask(prevState => [...prevState,
+                {
+                    id: response.data.name,
+                    ...task
+                }
+                ])
+                setModalShow(false)
+                setIsLoading(false)
+            }).catch(error => {
+                console.log(error)
             })
+    }
+    const editClickedHandler = (id) => {
+        const index = task.findIndex((el) => el.id === id);
+        const updatedtask = [...task]
+        const updatedtaskelement = {
+            ...updatedtask[index]
         }
+        setTaskToBeEdited(updatedtaskelement)
+        setEditModalShow(true)
     }
-    titleChangeHandler = (event) => {
-        this.setState({ title: event.target.value })
+    const deleteClickedHandler = (id) => {
+        axios.delete(`https://todolist-karthik.firebaseio.com/tasks/${id}.json`)
+            .then(response => {
+                setTask(prevState => prevState.filter(task => task.id !== id))
+            })
     }
-    editTitleHandler = (event) => {
-        this.setState({ edittitle: event.target.value })
-    }
-    descriptionChangeHandler = (event) => {
-        this.setState({ description: event.target.value })
-    }
-    editDescriptionHandler = (event) => {
-        this.setState({ editdescription: event.target.value })
-    }
-    addTaskHandler = (event) => {
-        event.preventDefault()
-        let newtask = {
-            title: this.state.title,
-            description: this.state.description,
-            completed: false
+    const completedClickedHandler = (id) => {
+        const index = task.findIndex((el) => el.id === id);
+        const updatedtask = [...task]
+        const updatedtaskelement = {
+            ...updatedtask[index]
         }
-        const updatedtask = this.state.task.slice()
-        updatedtask.push(newtask)
-        updatedtask.forEach((val, i, self) => {
-            self[i].id = i
-        })
-        this.setState({
-            task: updatedtask,
-            duplicatetask: updatedtask,
-            addingtask: false
-        })
+        updatedtaskelement.completed = true
+        updatedtask[index] = updatedtaskelement
+        axios.put(`https://todolist-karthik.firebaseio.com/tasks/${id}.json`, updatedtask[index])
+            .then(response => {
+                setTask(updatedtask)
+            })
     }
-    editClickedHandler = (id) => {
-        const updatedtask = this.state.task.slice()
-        const edittitle = updatedtask[id].title
-        const editdescription = updatedtask[id].description
-        this.setState({
-            editid: id,
-            edit: true,
-            edittitle: edittitle,
-            editdescription: editdescription,
-            addingtask: true,
-        })
+    const updateEditedHandler = editTask => {
+        setIsLoading(true)
+        let id = editTask.id
+        const index = task.findIndex((el) => el.id === id);
+        const updatedtask = [...task]
+        let updatedtaskelement = {
+            ...updatedtask[index]
+        }
+        updatedtaskelement = editTask
+        updatedtask[index] = updatedtaskelement
+        axios.put(`https://todolist-karthik.firebaseio.com/tasks/${id}.json`, editTask)
+            .then(response => {
+                setTask(updatedtask)
+                setEditModalShow(false)
+                setIsLoading(false)
+            })
     }
-    deleteClickedHandler = (id) => {
-        let newTask = this.state.task.slice();
-        newTask.splice(id, 1);
-        this.setState({
-            editid: null,
-            edit: false,
-            edittitle: null,
-            editdescription: null,
-            task: newTask,
-            duplicatetask: newTask
-        },() => this.idChangeHandler())
-    }
-    idChangeHandler = () => {
-        let newTask = this.state.task.slice();
-        newTask.forEach((val, i, self) => {
-            self[i].id = i
-        })
-        console.log(newTask)
-        this.setState({
-            task: newTask,
-        })
-    }
-    completedClickedHandler = (id) => {
-        let newTask = this.state.task.slice();
-        newTask[id].completed = true
-        this.setState({
-            task: newTask,
-            duplicatetask: newTask,
-        })
-    }
-    updateEditedHandler = (event) => {
-        event.preventDefault()
-        let id = this.state.editid
-        const updatedtask = this.state.task.slice()
-        updatedtask[id].title = this.state.edittitle
-        updatedtask[id].description = this.state.editdescription
-        this.setState({
-            task: updatedtask,
-            duplicatetask: updatedtask,
-            addingtask: false
-        })
-    }
-    render() {
-        return (
-            <div>
-                <Toolbar />
-                <div className="controls">
-                    <button className="addtask" onClick={this.modalShowHandler}>+ New Task</button>
-                    <Search Changed={this.searchtaskHandler} backspace={this.backspaceHandler}/>
-                </div>
-                {this.state.addingtask ? <Modal
-                    show={this.state.addingtask}
-                    editid={this.state.editid}
-                    edit={this.state.edit}
-                    edittitle={this.state.edittitle}
-                    editdescription={this.state.editdescription}
-                    clicked={this.addTaskHandler}
-                    doneclicked={this.updateEditedHandler}
-                    titlechanged={this.titleChangeHandler}
-                    edittitlechanged={this.editTitleHandler}
-                    deschanged={this.descriptionChangeHandler}
-                    editdeschanged={this.editDescriptionHandler}
-                    modalclosed={this.modalclosehandler} /> : null}
-                {!this.state.duplicatetask[0] ? <div className="empty">Your Task to Do List is Empty.</div> : null}
-                <Todolist
-                    alltask={this.state.task}
-                    editclicked={this.editClickedHandler}
-                    deleteclicked={this.deleteClickedHandler}
-                    completedclicked={this.completedClickedHandler} />
-                <div className="pagination1"> 
-                    <Paginationpage task={this.state.duplicatetask}/>
-                </div>
+    return (
+        <div>
+            <Toolbar />
+            <div className="controls">
+                <button className="addtask" onClick={modalShowHandler}>+ New Task</button>
+                <Search Changed={searchtaskHandler} />
             </div>
-        )
-    }
+            <Modal
+                show={modalShow}
+                isloading={isLoading}
+                addTask={addTaskHandler}
+                modalclosed={modalclosehandler} />
+            <EditModal 
+                show={editModalShow}
+                isloading={isLoading}
+                taskToBeEdited={taskToBeEdited}
+                editTask={updateEditedHandler}
+                modalclosed={modalclosehandler} />
+            {!task[0] ? <div className="empty">Your Task to Do List is Empty.</div> : null}
+            <Todolist
+                alltask={task}
+                editclicked={editClickedHandler}
+                deleteclicked={deleteClickedHandler}
+                completedclicked={completedClickedHandler}
+            />
+        </div>
+    )
 }
 
 export default Todolistbuilder

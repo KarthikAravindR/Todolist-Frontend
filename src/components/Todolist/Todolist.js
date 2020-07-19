@@ -4,6 +4,7 @@ import Todo from './Todo/Todo'
 import './Todolist.css'
 
 const todolist = (props) => {
+    console.log(props.alltask)
     return (
         <div className="todolist">
             {props.alltask.map((task) => {

@@ -1,11 +1,10 @@
 import React from 'react'
-
-import './Todo.css' 
+// import LoadingIndicator from '../../UI/LoadingIndicator/LoadingIndicator'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import {  } from '@fortawesome/free-regular-svg-icons';
 import { faTrashAlt,faThumbtack,faEdit,faCheckCircle} from '@fortawesome/free-solid-svg-icons';
 import { } from '@fortawesome/free-brands-svg-icons'
 
+import './Todo.css' 
 
 const todo = (props) => {
     return(
@@ -15,12 +14,11 @@ const todo = (props) => {
                 <p style={{fontSize:"2rem"}}>{props.title}</p>
                 <p style={{color:"rgba(0,0,0,0.5",marginBottom:"12px"}}>{props.description}</p>  
             </div>
-            <div className="completion">&#9679; {props.completed ? "Completed" : "In Progress"}</div>
+            <p className="completion">&#9679; {props.completed ? "Completed" : "Yet To Complete"} &#9679;</p>
             {!props.completed ?<div className="edit" onClick={() => props.editclicked(props.id)}><FontAwesomeIcon icon={faEdit}/></div>: null }
             <div className="delete" style={!props.completed ? {margin:"0 8px"}: {margin:"0 8px 0 auto"}} onClick={() => props.deleteclicked(props.id)}><FontAwesomeIcon icon={faTrashAlt}/></div>
             {!props.completed ? <div className="completed" onClick={() => props.completedclicked(props.id)}><FontAwesomeIcon icon={faCheckCircle}/></div>: null}
         </div>
     )
 }
-
 export default todo

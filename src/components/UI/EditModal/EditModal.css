@@ -12,9 +12,6 @@
     box-sizing: border-box;
     transition: all 0.3s ease-out;
 }
-.addtask1 {
-    display: flex;
-}
 input,textarea {
     width: 97%;
     border: 1px solid white;
