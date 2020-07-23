@@ -1,7 +1,9 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTheaterMasks, faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import { } from '@fortawesome/free-brands-svg-icons'
+
 import './Toolbar.css'
 
 const toolbar = (props) => {
@@ -14,15 +16,21 @@ const toolbar = (props) => {
             <div className="btn-group">
                 <FontAwesomeIcon style={{fontSize: "3.5rem"}} icon={faUserCircle} type="button" className="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"/>
                 <div className="dropdown-menu">
-                    <a className="dropdown-item" href="/">My Tasks To Do</a>
-                    <a className="dropdown-item" href="/">Another action</a>
-                    <a className="dropdown-item" href="/">Something else here</a>
+                    <Link className="dropdown-item" to="/mytasks">My Tasks To Do</Link>
                     <div className="dropdown-divider"></div>
-                    <a className="dropdown-item" href="/">Log Out</a>
-                </div>
+                    {!props.isAuthenticated ?
+                    <Link className="dropdown-item" to="/">Authentication</Link>
+                    :
+                    <Link className="dropdown-item" to="/logout">Log Out</Link>}
+                    </div>
             </div>
         </header>
     )
 }
+const mapStateToProps = state => {
+    return {
+        isAuthenticated: state.auth.token !== null,
+    }
+}
 
-export default toolbar
+export default connect(mapStateToProps)(toolbar)

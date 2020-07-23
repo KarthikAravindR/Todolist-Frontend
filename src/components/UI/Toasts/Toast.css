@@ -1,18 +1,30 @@
-.Modal {
+.Toast {
     position: fixed;
+    display: flex;
     z-index: 500;
-    background-color: #EDF2F9;
+    background-color: black;
     color:black;
-    border: 1px solid #EDF2F9;
-    width: 70%;
+    border: 1px solid black;
+    width: 17%;
+    line-height: 40px;
+    height: 72px;
     box-shadow: 1px 1px 1px black;
     padding: 16px;
-    left: 15%;
-    top: 22%;
+    right: 7%;
+    color:white;
+    border-radius: 7px;
+    top: 12%;
     box-sizing: border-box;
     transition: all 0.3s ease-out;
 }
-.addtask1 {
+.delete1 {
+    text-align: center;
+    background-color: red;
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+}
+/* .addtask1 {
     display: flex;
 }
 input,textarea {
@@ -24,14 +36,14 @@ input,textarea {
     margin-bottom: 16px;
     margin-top: 8px;
 }
-.task1 {
+.task {
     margin-left: 77%;
     background-color: skyblue;
     border: 1px solid skyblue;
     border-radius: 12px;
     width: 100px;
     height: 40px;
-}
+} */
 
 @media (min-width: 600px) {
     .Modal {

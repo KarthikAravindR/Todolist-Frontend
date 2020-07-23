@@ -1,149 +1,128 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
 
-import EditModal from '../../components/UI/EditModal/Editmodal'
-import Toolbar from '../../components/Toolbar/Toolbar'
-import Search from '../../components/UI/Search/Search'
-import searchfilter from '../../components/UI/Search/Searchfilter'
+import * as actions from '../../store/actions/index'
+import Toast from '../../components/UI/Toasts/Toast'
 import Modal from '../../components/UI/Modal/Modal'
+import EditModal from '../../components/UI/EditModal/Editmodal'
+import Search from '../../components/UI/Search/Search'
 import Todolist from '../../components/Todolist/Todolist'
 import './Todolistbuilder.css'
 
-const Todolistbuilder = () => {
-    const [task, setTask] = useState([])
-    const [modalShow, setModalShow] = useState(false)
-    const [editModalShow, setEditModalShow] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-    const [taskToBeEdited, setTaskToBeEdited] = useState({})
-
+const Todolistbuilder = (props) => {
+    const {onFetchTasks} = props;
+    const {token} = props;
+    const {isAuthenticated} = props;
+    const {userid} = props;
     useEffect(() => {
-        axios.get('https://todolist-karthik.firebaseio.com/tasks.json')
-            .then(response => {
-                const localTask = []
-                for (let key in response.data) {
-                    localTask.push({
-                        id: key,
-                        title: response.data[key].title,
-                        description: response.data[key].description
-                    })
-                }
-                setTask(localTask)
-            }).catch(error => [
-                console.log(error)
-            ])
-    }, [])
+        console.log("FETCHING")
+        onFetchTasks(token,userid)
+    },[token,onFetchTasks,isAuthenticated,userid])
+
     const modalShowHandler = () => {
-        setModalShow(true)
+        props.onModalShow()
     }
     const modalclosehandler = () => {
-        setModalShow(false)
-        setEditModalShow(false)
+        props.onModalClose()
     }
     const searchtaskHandler = (event) => {
         const searchtext = event.target.value
-        axios.get('https://todolist-karthik.firebaseio.com/tasks.json')
-            .then(response => {
-                const localTask = []
-                for (let key in response.data) {
-                    localTask.push({
-                        id: key,
-                        title: response.data[key].title,
-                        description: response.data[key].description
-                    })
-                }
-                setTask(searchfilter(searchtext, localTask))
-            }).catch(error => [
-                console.log(error)
-            ])
+        props.onSearchTasks(searchtext,props.token)
     }
     const addTaskHandler = task => {
-        setIsLoading(true)
-        axios.post('https://todolist-karthik.firebaseio.com/tasks.json', task)
-            .then(response => {
-                setTask(prevState => [...prevState,
-                {
-                    id: response.data.name,
-                    ...task
-                }
-                ])
-                setModalShow(false)
-                setIsLoading(false)
-            }).catch(error => {
-                console.log(error)
-            })
+        props.onAddTasks(task,props.token)
     }
     const editClickedHandler = (id) => {
-        const index = task.findIndex((el) => el.id === id);
-        const updatedtask = [...task]
+        const index = props.task.findIndex((el) => el.id === id);
+        const updatedtask = [...props.task]
         const updatedtaskelement = {
             ...updatedtask[index]
         }
-        setTaskToBeEdited(updatedtaskelement)
-        setEditModalShow(true)
+        props.onEditInit(updatedtaskelement)
     }
     const deleteClickedHandler = (id) => {
-        axios.delete(`https://todolist-karthik.firebaseio.com/tasks/${id}.json`)
-            .then(response => {
-                setTask(prevState => prevState.filter(task => task.id !== id))
-            })
+        props.onDeleteTasks(id,props.token)
     }
     const completedClickedHandler = (id) => {
-        const index = task.findIndex((el) => el.id === id);
-        const updatedtask = [...task]
+        const index = props.task.findIndex((el) => el.id === id);
+        const updatedtask = [...props.task]
         const updatedtaskelement = {
             ...updatedtask[index]
         }
         updatedtaskelement.completed = true
         updatedtask[index] = updatedtaskelement
-        axios.put(`https://todolist-karthik.firebaseio.com/tasks/${id}.json`, updatedtask[index])
-            .then(response => {
-                setTask(updatedtask)
-            })
+        props.onCompletedTasks(id,index,updatedtask,props.token)
     }
     const updateEditedHandler = editTask => {
-        setIsLoading(true)
         let id = editTask.id
-        const index = task.findIndex((el) => el.id === id);
-        const updatedtask = [...task]
+        const index = props.task.findIndex((el) => el.id === id);
+        const updatedtask = [...props.task]
         let updatedtaskelement = {
             ...updatedtask[index]
         }
         updatedtaskelement = editTask
         updatedtask[index] = updatedtaskelement
-        axios.put(`https://todolist-karthik.firebaseio.com/tasks/${id}.json`, editTask)
-            .then(response => {
-                setTask(updatedtask)
-                setEditModalShow(false)
-                setIsLoading(false)
-            })
+        props.onEditTasks(editTask,updatedtask,props.token)
+    }
+    const askToSignHandler = () => {
+        props.history.replace('/')
     }
     return (
         <div>
-            <Toolbar />
-            <div className="controls">
-                <button className="addtask" onClick={modalShowHandler}>+ New Task</button>
-                <Search Changed={searchtaskHandler} />
-            </div>
-            <Modal
-                show={modalShow}
-                isloading={isLoading}
-                addTask={addTaskHandler}
-                modalclosed={modalclosehandler} />
-            <EditModal 
-                show={editModalShow}
-                isloading={isLoading}
-                taskToBeEdited={taskToBeEdited}
-                editTask={updateEditedHandler}
-                modalclosed={modalclosehandler} />
-            {!task[0] ? <div className="empty">Your Task to Do List is Empty.</div> : null}
-            <Todolist
-                alltask={task}
-                editclicked={editClickedHandler}
-                deleteclicked={deleteClickedHandler}
-                completedclicked={completedClickedHandler}
-            />
+            {props.isAuthenticated? <div>
+                <div className="controls">
+                    <button className="addtask" onClick={modalShowHandler}>+ New Task</button>
+                    <Search Changed={searchtaskHandler} />
+                </div>
+                <Toast />
+                <Modal
+                    show={props.modalShow}
+                    isloading={props.isLoading}
+                    addTask={addTaskHandler}
+                    modalclosed={modalclosehandler} />
+                <EditModal 
+                    show={props.editModalShow}
+                    isloading={props.isLoading}
+                    taskToBeEdited={props.taskToBeEdited}
+                    editTask={updateEditedHandler}
+                    modalclosed={modalclosehandler} />
+                {/* {!props.task[0] ? <div className="empty">Your Task to Do List is Empty.</div> : null} */}
+                <Todolist
+                    alltask={props.task}
+                    editclicked={editClickedHandler}
+                    deleteclicked={deleteClickedHandler}
+                    completedclicked={completedClickedHandler}
+                />
+            </div> 
+            :<div className="askToSignHandler">
+                <button onClick={askToSignHandler} type="button" className="btn btn-light">Sign In To Be Productive.It Just Takes Two Minutes</button>
+            </div> }
         </div>
     )
 }
-
-export default Todolistbuilder
+const mapStateToProps = state => {
+    return{
+        task: state.task.tasks,
+        modalShow: state.task.modalShow,
+        editModalShow: state.task.editModalShow,
+        isLoading: state.task.isLoading,
+        taskToBeEdited: state.task.taskToBeEdited,
+        token: state.auth.token,
+        isAuthenticated: state.auth.token !== null,
+        userid: state.auth.userid
+    }
+}
+const mapDispatchToState = dispatch => {
+    return{
+        onFetchTasks: (token,userid) => {dispatch(actions.Tasks(token,userid))},
+        onAddTasks: (task,token) => {dispatch(actions.addTask(task,token))},
+        onEditInit: (updatedtaskelement) => {dispatch(actions.editTaskInit(updatedtaskelement))},
+        onEditTasks: (editTask, updatedtask,token) => {dispatch(actions.editTask(editTask, updatedtask,token))},
+        onDeleteTasks: (id,token) => {dispatch(actions.deleteTask(id,token))},
+        onCompletedTasks: (id,index,updatedtask,token) => {dispatch(actions.completedTask(id,index,updatedtask,token))},
+        onSearchTasks: (searchtext,token) => {dispatch(actions.searchTask(searchtext,token))},
+        onModalShow: () => {dispatch(actions.modalShow())},
+        onModalClose: () => {dispatch(actions.modalClose())},
+    }
+}
+export default connect(mapStateToProps,mapDispatchToState)(Todolistbuilder)
