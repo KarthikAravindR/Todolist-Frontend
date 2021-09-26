@@ -7,10 +7,10 @@ const todolist = (props) => {
     console.log(props.alltask)
     return (
         <div className="todolist">
-            {props.alltask.map((task) => {
+            {props.alltask[0] && props.alltask.map((task) => {
                     return <Todo 
-                                key={task.id}
-                                id={task.id}
+                                key={task._id}
+                                id={task._id}
                                 title={task.title} 
                                 description={task.description}
                                 completed={task.completed}

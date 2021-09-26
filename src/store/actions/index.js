@@ -1,7 +1,9 @@
 export {
     auth,
     logout,
-    authCheckState
+    authCheckState,
+    googleauth,
+    facebookauth,
 } from './Auth'
 
 export {

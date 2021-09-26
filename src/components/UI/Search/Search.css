@@ -2,16 +2,18 @@
     display: flex;
 }
 .searchbar1 {
-    padding:12px 16px;
+    padding:0 16px;
     box-sizing: border-box;
     width: 180px;
-    color: black;
-    border:1px solid rgb(136, 113, 113);
+    background-color: #11131c;
+    color: #ffffff;
+    border:1px solid #11131c;
     border-radius: 5px;
 }
 .searchbar1:hover, .searchbar1:focus ,.button2:hover, .button2:focus{
     border-radius: 5px;
-    border: 1px solid rgb(0, 0, 0);
+    border: 1px solid #11131c;
+    outline: none;
 }
 
 .button2 {

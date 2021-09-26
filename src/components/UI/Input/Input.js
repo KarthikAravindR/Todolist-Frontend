@@ -29,9 +29,10 @@ const input = (props) => {
 
     return (
         <div className={classes.Input}>
-            <label className={classes.Label}>{props.label}</label>
             {inputelement}
-            <p className={allclass.join(' ')}>*This Field is required*</p>  
+            {props.error && <p>{props.label === 'name' && <span className={allclass.join(' ')}>This Field is required</span>  }</p>}
+            {props.error && <p>{props.label === 'email' && <span className={allclass.join(' ')}>Enter a Valid Email</span>  }</p>}
+            {props.error && <p>{props.label === 'password' && <span className={allclass.join(' ')}>Minimum Length should be Seven Characters</span>  }</p>}
         </div>
     )
 }

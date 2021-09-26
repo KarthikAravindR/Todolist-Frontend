@@ -8,6 +8,7 @@
     box-sizing: border-box;
     align-items: center;
     box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    color: white;
 }
 .todo:hover,.todo:focus {
     box-shadow: 0 1px 2px rgba(0,0,0,0.75);
@@ -26,8 +27,9 @@ p{
     line-height: 40px;
     padding-left: 4px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    color: #090B10;
     box-sizing: border-box;
-    background-color: #ccc;
+    background-color: #BB86FC;
     margin-left: auto;
     margin-right: 8px;
     width: 40px;
@@ -37,19 +39,21 @@ p{
 .delete{
     text-align: center;
     line-height: 40px;
-    background-color: red;
+    background-color: rgb(250, 132, 132);
     width: 40px;
     height: 40px;
     border-radius: 100px;
+    color: #090B10;
 }
 .completed{
     text-align: center;
     line-height: 40px;
-    background-color: green;
+    background-color: rgb(126, 252, 126);
     margin: 0 8px;
     width: 40px;
     height: 40px;
     border-radius: 100px;
+    color: #090B10;
 }
 
 @media (max-width: 900px) {

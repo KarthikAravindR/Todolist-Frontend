@@ -1,5 +1,10 @@
+.Toolbar_container{
+    background-color: #090B10;
+    min-height: 100vh;
+    height: auto;
+}
 .controls {
-    margin-top: 100px;
+    padding-top: 100px;
     display: flex;
     justify-content: space-evenly;
 }

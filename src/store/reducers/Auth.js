@@ -2,7 +2,10 @@ import * as actionTypes from '../actions/actionTypes'
 
 const inditialState = {
     token: null,
-    userid: null,
+    userId: null,
+    username: null,
+    image: null,
+    email: null,
     error: null,
     loading: false
 }
@@ -18,8 +21,11 @@ const reducer = (state = inditialState, action) => {
         case actionTypes.AUTH_SUCCESS :
             return {
                 ...state,
-                token: action.idToken,
-                userid: action.localId,
+                token: action.token,
+                userId: action.userId,
+                username: action.username,
+                image: action.image,
+                email: action.email,
                 loading: false
             }
         case actionTypes.AUTH_FAILED :

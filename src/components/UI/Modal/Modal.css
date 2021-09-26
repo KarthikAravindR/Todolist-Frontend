@@ -1,24 +1,30 @@
 .Modal {
     position: fixed;
     z-index: 500;
-    background-color: #EDF2F9;
-    color:black;
-    border: 1px solid #EDF2F9;
+    color:white;
+    border: 1px solid #090B10;
     width: 70%;
-    box-shadow: 1px 1px 1px black;
+    box-shadow: 0px 0px 10px #090B10;
     padding: 16px;
     left: 15%;
     top: 22%;
     box-sizing: border-box;
     transition: all 0.3s ease-out;
+    background-color: #090B10;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .addtask1 {
     display: flex;
 }
 input,textarea {
     width: 97%;
-    border: 1px solid white;
+    background-color: #11131c;
+    border: 1px solid #11131c;
+    color: white;
     padding: 8px;
+}
+input:hover, input:focus ,textarea:hover, textarea:focus{
+    outline: none;
 }
 .inputelement {
     margin-bottom: 16px;

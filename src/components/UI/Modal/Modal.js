@@ -9,7 +9,7 @@ import Backdrop from '../Backdrop/Backdrop'
 const Modal = (props) =>  {
         const submitHandler = event => {
             event.preventDefault()
-            props.addTask({title: props.title, description: props.description, completed: false, userId: props.userId})
+            props.addTask({title: props.title, description: props.description, completed: false})
             props.onSetTitle('')
             props.onSetDescription('')
         }

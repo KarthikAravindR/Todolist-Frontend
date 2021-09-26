@@ -19,22 +19,18 @@ export const fetchTasksFailed = (error) => {
         error: error
     }
 }
-export const Tasks = (token,userId) => {
+export const Tasks = (token, id) => {
     return dispatch => {
         dispatch(fetchTasksStart())
-        const queryparams = '?auth=' + token + '&orderBy="userId"&equalTo="' + userId + '"'
-        axios.get('https://todolist-karthik.firebaseio.com/tasks.json' + queryparams)
+        let config = {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            }
+        }
+        axios.get(process.env.REACT_APP_BACKEND_URL + '/gettasks/' + id, config)
             .then(response => {
-                const localTask = []
-                for (let key in response.data) {
-                    localTask.push({
-                        id: key,
-                        title: response.data[key].title,
-                        description: response.data[key].description,
-                        completed: response.data[key].completed,
-                    })
-                }
-                dispatch(fetchTasksSuccess(localTask))
+                console.log(response)
+                dispatch(fetchTasksSuccess(response.data.userTasks))
             }).catch(error => {
                 dispatch(fetchTasksFailed(error))
             })
@@ -46,10 +42,9 @@ export const addTaskStart = () => {
         type: actionTypes.ADD_TASK_START
     }
 }
-export const addTaskSuccess = (id,data) => {
+export const addTaskSuccess = (data) => {
     return {
         type: actionTypes.ADD_TASK_SUCCESS,
-        id: id,
         data: data
     }
 }
@@ -59,13 +54,18 @@ export const addTaskFailed = (error) => {
         error: error
     }
 }
-export const addTask = (task,token) => {
+export const addTask = (task, token, id) => {
     return dispatch => {
         dispatch(addTaskStart())
-        axios.post('https://todolist-karthik.firebaseio.com/tasks.json?auth=' + token, task)
+        let config = {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            }
+        }
+        axios.post(process.env.REACT_APP_BACKEND_URL + '/task/new/' + id, task, config)
             .then(response => {
-                console.log(response.data.name,task)
-                dispatch(addTaskSuccess(response.data.name,task))
+                console.log(response)
+                dispatch(addTaskSuccess(response.data.userTasks))
             }).catch(error => {
                 dispatch(addTaskFailed(error))
             })
@@ -83,10 +83,10 @@ export const editTaskStart = () => {
         type: actionTypes.EDIT_TASK_START
     }
 }
-export const editTaskSuccess = (updatedtask) => {
+export const editTaskSuccess = (editTask) => {
     return {
         type: actionTypes.EDIT_TASK_SUCCESS,
-        updatedtask: updatedtask
+        editTask: editTask
     }
 }
 export const editTaskFailed = (error) => {
@@ -95,11 +95,20 @@ export const editTaskFailed = (error) => {
         error: error
     }
 }
-export const editTask = (editTask, updatedtask,token) => {
+export const editTask = (editTask, id, token) => {
+    console.log(editTask, id)
     return dispatch => {
-        axios.put(`https://todolist-karthik.firebaseio.com/tasks/${editTask.id}.json?auth=` + token, editTask)
+        let config = {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            }
+        }
+        let data = {
+            editTask: editTask
+        }
+        axios.post(process.env.REACT_APP_BACKEND_URL + '/task/edit/' + id, data, config)
             .then(response => {
-                dispatch(editTaskSuccess(updatedtask))
+                dispatch(editTaskSuccess(editTask))
             })
             .catch(error => {
                 dispatch(editTaskFailed(error))
@@ -123,15 +132,20 @@ export const deleteTaskFailed = (error) => {
         error: error
     }
 }
-export const deleteTask = (id,token) => {
+export const deleteTask = (taskid, token, id) => {
     return dispatch => {
         dispatch(deleteTaskStart())
-        axios.delete(`https://todolist-karthik.firebaseio.com/tasks/${id}.json?auth=`+ token)
+        let config = {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            }
+        }
+        let data = {
+            taskid: taskid
+        }
+        axios.post(process.env.REACT_APP_BACKEND_URL + '/task/delete/' + id, data, config)
             .then(response => {
-                dispatch(deleteTaskSuccess(id))
-                setTimeout(() => {
-                    dispatch(deleteTaskAlert())
-                },2000)
+                dispatch(deleteTaskSuccess(taskid))
             })
             .catch(error => {
                 dispatch(deleteTaskFailed(error))
@@ -149,10 +163,10 @@ export const completedTaskStart = () => {
         type: actionTypes.COMPLETED_TASK_START
     }
 }
-export const completedTaskSuccess = (updatedtask) => {
+export const completedTaskSuccess = (id) => {
     return {
         type: actionTypes.COMPLETED_TASK_SUCCESS,
-        updatedtask: updatedtask
+        id: id
     }
 }
 export const completedTaskFailed = () => {
@@ -160,12 +174,21 @@ export const completedTaskFailed = () => {
         type: actionTypes.COMPLETED_TASK_FAILED
     }
 }
-export const completedTask = (id,index,updatedtask,token) => {
+export const completedTask = (taskid, id, token) => {
     return dispatch => {
         dispatch(completedTaskStart())
-        axios.put(`https://todolist-karthik.firebaseio.com/tasks/${id}.json?auth=` + token, updatedtask[index])
+        let config = {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            }
+        }
+        let data = {
+            taskid: taskid
+        }
+        axios.post(process.env.REACT_APP_BACKEND_URL + '/task/editcomplete/' + id, data, config)
             .then(response => {
-                dispatch(completedTaskSuccess(updatedtask))
+                console.log(response)
+                dispatch(completedTaskSuccess(taskid))
             })
             .catch(error => {
                 dispatch(completedTaskFailed(error))
@@ -186,32 +209,29 @@ export const searchTaskFailed = (error) => {
         error: error
     }
 }
-export const searchTask = (searchtext,token) => {
+export const searchTask = (searchtext, token, id) => {
     return dispatch => {
-        axios.get('https://todolist-karthik.firebaseio.com/tasks.json?auth=' + token)
+        let config = {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            }
+        }
+        axios.get(process.env.REACT_APP_BACKEND_URL + '/gettasks/' + id, config)
             .then(response => {
-                const localTask = []
-                for (let key in response.data) {
-                    localTask.push({
-                        id: key,
-                        title: response.data[key].title,
-                        description: response.data[key].description,
-                        completed: response.data[key].completed,
-                    })
-                }
-                dispatch(searchTaskSuccess(searchtext, localTask))
+                dispatch(searchTaskSuccess(searchtext, response.data.userTasks))
             }).catch(error => {
                 dispatch(searchTaskFailed(error))
             })
-}}
+    }
+}
 
 export const modalShow = () => {
-    return{
-        type:actionTypes.MODAL_SHOW
+    return {
+        type: actionTypes.MODAL_SHOW
     }
 }
 export const modalClose = () => {
-    return{
-        type:actionTypes.MODAL_CLOSE
+    return {
+        type: actionTypes.MODAL_CLOSE
     }
 }

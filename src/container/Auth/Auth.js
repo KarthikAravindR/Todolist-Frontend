@@ -1,15 +1,31 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import GoogleLogin from 'react-google-login';
+import FacebookLogin from 'react-facebook-login';
 
-import * as actions from  '../../store/actions/index'
+import * as actions from '../../store/actions/index'
 import Input from '../../components/UI/Input/Input'
 import './Auth.css'
+// import Logo from '../../components/UI/Input/Input'
 import Spinner from '../../components/UI/LoadingIndicator/LoadingIndicator'
-import { Redirect } from 'react-router-dom'
+import authectication from '../../assets/images/authentication2.jpg'
 
 const Auth = (props) => {
 
-    const [ authForm,setAuthForm ] = useState({
+    const [signupForm, setSignupForm] = useState({
+        name: {
+            elementtype: 'input',
+            elementconfig: {
+                placeholder: 'Your Name',
+                type: 'input'
+            },
+            value: '',
+            validation: {
+                isrequired: true,
+            },
+            valid: true
+        },
         email: {
             elementtype: 'input',
             elementconfig: {
@@ -37,114 +53,245 @@ const Auth = (props) => {
             valid: true
         },
     })
-    const [isSignup, setIsSignup] = useState(true)
+    const [loginForm, setLoginForm] = useState({
+        email: {
+            elementtype: 'input',
+            elementconfig: {
+                placeholder: 'Your Mail',
+                type: 'input'
+            },
+            value: '',
+            validation: {
+                isrequired: true,
+                isEmail: true
+            },
+            valid: true
+        },
+        password: {
+            elementtype: 'input',
+            elementconfig: {
+                placeholder: 'Password',
+                type: 'password'
+            },
+            value: '',
+            validation: {
+                isrequired: true,
+                minLength: 7
+            },
+            valid: true
+        },
+    })
+    const [isSignup, setIsSignup] = useState(false)
 
+    const { userId } = props
+    const { history } = props
+    useEffect(() => {
+        if (userId) {
+            console.log('userId')
+            history.push(`/mytasks/${userId}`)
+        }
+    }, [userId, history])
 
-const checkValidity = (value, rules) => {
-    let isValid = true;
-    if (!rules) {
-        return true;
+    const checkValidity = (value, rules) => {
+        let isValid = true;
+        if (!rules) {
+            return true;
+        }
+        if (rules.isrequired) {
+            isValid = value.trim() !== '' && isValid;
+        }
+        if (rules.minLength) {
+            isValid = value.length >= rules.minLength && isValid
+        }
+        if (rules.maxLength) {
+            isValid = value.length <= rules.maxLength && isValid
+        }
+        if (rules.isEmail) {
+            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+            isValid = pattern.test(value) && isValid
+        }
+        if (rules.isNumeric) {
+            const pattern = /^\d+$/;
+            isValid = pattern.test(value) && isValid
+        }
+        return isValid;
     }
-    if (rules.isrequired) {
-        isValid = value.trim() !== '' && isValid;
-    }
-    if (rules.minLength) {
-        isValid = value.length >= rules.minLength && isValid
-    }
-    if (rules.maxLength) {
-        isValid = value.length <= rules.maxLength && isValid
-    }
-    if (rules.isEmail) {
-        const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-        isValid = pattern.test(value) && isValid
-    }
-    if (rules.isNumeric) {
-        const pattern = /^\d+$/;
-        isValid = pattern.test(value) && isValid
-    }
-    return isValid;
-}
 
-const inputchangeHandler = (event, controlname) => {
-    const updatedControls = {
-        ...authForm,
-        [controlname]: {
-            ...authForm[controlname],
-            value: event.target.value,
-            valid: checkValidity(event.target.value, authForm[controlname].validation)
+    const inputchangeHandler = (event, controlname) => {
+        if (isSignup) {
+            const updatedControls = {
+                ...signupForm,
+                [controlname]: {
+                    ...signupForm[controlname],
+                    value: event.target.value,
+                    valid: checkValidity(event.target.value, signupForm[controlname].validation)
+                }
+            }
+            setSignupForm(updatedControls)
+        } else {
+            const updatedControls1 = {
+                ...loginForm,
+                [controlname]: {
+                    ...loginForm[controlname],
+                    value: event.target.value,
+                    valid: checkValidity(event.target.value, loginForm[controlname].validation)
+                }
+            }
+            setLoginForm(updatedControls1)
         }
     }
-    setAuthForm(updatedControls)
-}
 
-const switchAuthModeHandler = () => {
-    setIsSignup(!isSignup);
-}
-
-const authenticationHandler = (event) => {
-    event.preventDefault()
-    props.onAuthHandler(authForm.email.value, authForm.password.value, isSignup)
-}
-
-let formelementarray = [];
-for (let key in authForm) {
-    formelementarray.push({
-        id: key,
-        config: authForm[key]
-    })
-}
-let form =
-    <form>
-        {formelementarray.map(formelement => (
-            <Input key={formelement.id}
-                shouldvalidate={formelement.config.validation}
-                validity={formelement.config.valid}
-                changd={(event) => inputchangeHandler(event, formelement.id)}
-                label={formelement.id}
-                elementtype={formelement.config.elementtype}
-                elementconfig={formelement.config.elementconfig}
-                value={formelement.config.value} />
-        ))}
-    </form>
-
-let errorMessage = null
-if (props.error) {
-    errorMessage = <p>{props.error.message}</p>
-}
-
-let authRedirect = null;
-if (props.isAuthenticated) {
-        authRedirect = <Redirect to="/mytasks" />
+    const switchAuthModeHandler = () => {
+        setIsSignup(!isSignup);
+        props.onclearerror()
     }
 
-return (
-    <div>
-        <div className="Auth">
-            {authRedirect}
-            {errorMessage}
-            {form}
-            <button onClick={authenticationHandler} type="button" className="btn btn-light">{isSignup ? 'Create Account' : 'Log-IN'}</button>
-            {props.loading && <Spinner />}
+    const authenticationHandler = event => {
+        event.preventDefault()
+        if (isSignup) {
+            props.onauthHandler(signupForm.email.value, signupForm.password.value, isSignup, signupForm.name.value,)
+        } else {
+            props.onauthHandler(loginForm.email.value, loginForm.password.value, isSignup)
+        }
+    }
+
+    const responseSuccessGoogle = (response) => {
+        console.log(response)
+        props.ongoogleauth(response)
+    }
+    const responseFailureGoogle = (response) => {
+        console.log(response)
+    }
+
+    const responseFacebook = (response) => {
+        props.onFacebookAuth(response)
+    }
+
+    const redirectToGithub = () => {
+        var win = window.open('https://github.com/KarthikAravindR', '_blank');
+        win.focus();
+    }
+
+    let formelementarray1 = [];
+    let formelementarray2 = [];
+    if (isSignup) {
+        for (let key in signupForm) {
+            formelementarray1.push({
+                id: key,
+                config: signupForm[key]
+            })
+        }
+    } else {
+        for (let key in loginForm) {
+            formelementarray2.push({
+                id: key,
+                config: loginForm[key]
+            })
+        }
+    }
+    let form1 = null
+    let form2 = null
+    if (isSignup) {
+        form1 =
+            <form>
+                {formelementarray1.map(formelement => (
+                    <Input key={formelement.id}
+                        error={true}
+                        shouldvalidate={formelement.config.validation}
+                        validity={formelement.config.valid}
+                        changd={(event) => inputchangeHandler(event, formelement.id)}
+                        label={formelement.id}
+                        elementtype={formelement.config.elementtype}
+                        elementconfig={formelement.config.elementconfig}
+                        value={formelement.config.value} />
+                ))}
+            </form>
+    } else {
+        form2 =
+            <form>
+                {formelementarray2.map(formelement => (
+                    <Input key={formelement.id}
+                        error={false}
+                        shouldvalidate={formelement.config.validation}
+                        validity={formelement.config.valid}
+                        changd={(event) => inputchangeHandler(event, formelement.id)}
+                        label={formelement.id}
+                        elementtype={formelement.config.elementtype}
+                        elementconfig={formelement.config.elementconfig}
+                        value={formelement.config.value} />
+                ))}
+            </form>
+    }
+
+    let signupbutton = <p>New To Atheneum? <span style={{ color: "#FFc038", cursor: "pointer" }} onClick={switchAuthModeHandler}>Create an Account</span></p>
+    let loginbutton = <p>Already have an account? <span style={{ color: "#FFc038", cursor: "pointer" }} onClick={switchAuthModeHandler}>Log-In here</span></p>
+    return (
+        <div className="Authentication">
+            <div id="egg">
+                <div className="Authenticationarea">
+                    <div className="people">
+                        <div className="authtitle"><p>ToDoTo</p></div>
+                        <div className="peopleimg">
+                            <img src={authectication} alt="" />
+                        </div>
+                    </div>
+                    <div className="Authenticationform">
+                        <p className="welcomemedia">Welcome to your TodoList</p>
+                        <div className="Auth">
+                            {props.error && <div className="errormessage">
+                                {props.error}
+                            </div>}
+                            {isSignup ? form1 : form2}
+                            <div className="signupbutton">
+                                <button onClick={authenticationHandler} type="button" className="btn btn-light"><p>{ props.loading ? <Spinner /> :<span>{isSignup ? 'Sign Up' : 'Log-IN'}</span>}</p></button>
+                            </div>
+                            <div className="or">
+                                <div className="ordash"></div>
+                                <div className="orword">or</div>
+                                <div className="ordash"></div>
+                            </div>
+                            <div className="Auth_GFB">
+                                <GoogleLogin
+                                    clientId="162003935215-rp7i00q4jsf94gdg6afqdtmkbr1ohbmk.apps.googleusercontent.com"
+                                    className="googlebutton"
+                                    buttonText=""
+                                    onSuccess={responseSuccessGoogle}
+                                    onFailure={responseFailureGoogle}
+                                    cookiePolicy={'single_host_origin'}
+                                />
+                                <FacebookLogin
+                                    appId="447049766349813"
+                                    fields="name,email,picture"
+                                    icon="fa-facebook"
+                                    textButton=""
+                                    callback={responseFacebook} />
+                            </div>
+                            <p className="signupbutton2">{isSignup ? loginbutton : signupbutton}</p>
+                            <p className="developer">developed by <span onClick={redirectToGithub}>Karthik Aravind R</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div className="signupbutton">
-            <button onClick={switchAuthModeHandler} type="button" className="btn btn-light">{isSignup ? 'Already have an Account. Sign-In Over here' : 'New To DoToDO ? Create New Account'}</button>
-        </div>
-    </div>
-)
+    )
 }
 
 const mapStateToProps = state => {
     return {
+        userId: state.auth.userId,
         loading: state.auth.loading,
         error: state.auth.error,
-        isAuthenticated: state.auth.token !== null,
     }
 }
-
 const mapDispatchToState = dispatch => {
-    return{
-        onAuthHandler: (email, password, isSignup) => dispatch(actions.auth(email, password, isSignup))
+    return {
+        onauthHandler: (email, password, isSignup, name) => { dispatch(actions.auth(email, password, isSignup, name)) },
+        ongoogleauth: (response) => { dispatch(actions.googleauth(response)) },
+        onFacebookAuth: (response) => { dispatch(actions.facebookauth(response)) },
+        onclearerror: () => { dispatch({ type: "CLEAR_AUTH_ERROR" }) },
     }
 }
+export default withRouter(connect(mapStateToProps, mapDispatchToState)(Auth))
 
-export default connect(mapStateToProps, mapDispatchToState)(Auth)
+
+

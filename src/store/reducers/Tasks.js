@@ -50,7 +50,6 @@ const reducer = (state = initialState, action) => {
         case actionTypes.ADD_TASK_SUCCESS:
             const newOrder = {
                 ...action.data,
-                id:action.id
             }
             return {
                 ...state,
@@ -78,9 +77,17 @@ const reducer = (state = initialState, action) => {
                 isLoading: true,
             }
         case actionTypes.EDIT_TASK_SUCCESS:
+            let id = action.editTask._id
+            const index = state.tasks.findIndex((el) => el._id === id);
+            const updatedtask = [...state.tasks]
+            let updatedtaskelement = {
+                ...updatedtask[index]
+            }
+            updatedtaskelement = action.editTask
+            updatedtask[index] = updatedtaskelement
             return {
                 ...state,
-                tasks: action.updatedtask,
+                tasks: updatedtask,
                 isLoading: false,
                 editModalShow: false
             }
@@ -100,14 +107,14 @@ const reducer = (state = initialState, action) => {
         case actionTypes.DELETE_TASK_SUCCESS:
             return {
                 ...state,
-                tasks: state.tasks.filter(task => task.id !== action.id),
+                tasks: state.tasks.filter(task => task._id !== action.id),
                 isLoading: false,
-                successfullydeleted:true
+                successfullydeleted: true
             }
         case actionTypes.DELETE_TASK_ALERT:
-            return{
+            return {
                 ...state,
-                successfullydeleted:false
+                successfullydeleted: false
             }
         case actionTypes.DELETE_TASK_FAILED:
             return {
@@ -122,10 +129,16 @@ const reducer = (state = initialState, action) => {
                 isLoading: true,
             }
         case actionTypes.COMPLETED_TASK_SUCCESS:
-            console.log(action.updatedTask)
+            const index1 = state.tasks.findIndex((el) => el._id === action.id)
+            const updatedtask1 = [...state.tasks]
+            const updatedtaskelement1 = {
+                ...updatedtask1[index1]
+            }
+            updatedtaskelement1.completed = true
+            updatedtask1[index1] = updatedtaskelement1
             return {
                 ...state,
-                tasks: action.updatedtask,  
+                tasks: updatedtask1,
                 isLoading: false,
             }
         case actionTypes.COMPLETED_TASK_FAILED:
@@ -138,12 +151,23 @@ const reducer = (state = initialState, action) => {
         case actionTypes.SEARCH_TASK_SUCCESS:
             return {
                 ...state,
-                tasks: searchfilter(action.searchtext,action.localTask),
+                tasks: searchfilter(action.searchtext, action.localTask),
             }
         case actionTypes.SEARCH_TASK_FAILED:
             return {
                 ...state,
                 error: action.error
+            }
+        case actionTypes.AUTH_LOGOUT_2:
+            return {
+                ...state,
+                tasks: [],
+                modalShow: false,
+                editModalShow: false,
+                isLoading: false,
+                error: null,
+                taskToBeEdited: {},
+                successfullydeleted: false
             }
         default:
             return state
